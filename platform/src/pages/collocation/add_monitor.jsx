@@ -8,11 +8,11 @@ import {
   getRunningQueriesThunk,
 } from '@/lib/store/services/deviceRegistry';
 import { wrapper } from '@/lib/store';
-import Table from '../../common/components/AddMonitor/Table';
-import SkeletonFrame from '../../common/components/AddMonitor/Skeletion';
+import Table from '../../common/components/Collocation/AddMonitor/Table';
+import SkeletonFrame from '../../common/components/Collocation/AddMonitor/Skeleton';
 import { useSelector } from 'react-redux';
 import CheckCircleIcon from '@/icons/check_circle';
-import ScheduleCalendar from '../../common/components/AddMonitor/Calendar';
+import ScheduleCalendar from '../../common/components/Collocation/AddMonitor/Calendar';
 import { useCollocateDevicesMutation } from '@/lib/store/services/collocation';
 import Toast from '../../common/components/Toast';
 import { useRouter } from 'next/router';
@@ -74,36 +74,34 @@ const AddMonitor = () => {
 
   return (
     <Layout>
-      {/* SKELETON LOADER */}
+      <NavigationBreadCrumb backLink={'/collocation/collocate'} navTitle={'Add monitor'}>
+        <div className='flex'>
+          {onUpdateSelectedCollocateDevices && (
+            <Button className={'mr-1'}>
+              <div className='mr-1'>
+                <CheckCircleIcon />
+              </div>{' '}
+              Saved
+            </Button>
+          )}
+          <Button
+            className={`rounded-none text-white bg-blue border border-blue font-medium ${
+              selectedCollocateDevices.length > 0 && endDate && startDate
+                ? 'cursor-pointer'
+                : 'opacity-40 cursor-not-allowed'
+            }`}
+            onClick={handleCollocation}>
+            Start collocation
+          </Button>
+        </div>
+      </NavigationBreadCrumb>
       {isLoading ? (
-        <SkeletonFrame />
+        <SkeletonFrame frameTitle={'Add monitor'} />
       ) : (
         <>
           {(isError || errorValue) && (
             <Toast variant={'error'} message='Error: Unable to fetch devices' />
           )}
-          <NavigationBreadCrumb backLink={'/collocation/collocate'} navTitle={'Add monitor'}>
-            <div className='flex'>
-              {onUpdateSelectedCollocateDevices && (
-                <Button className={'mr-1'}>
-                  <div className='mr-1'>
-                    <CheckCircleIcon />
-                  </div>{' '}
-                  Saved
-                </Button>
-              )}
-              <Button
-                className={`rounded-none text-white bg-blue border border-blue font-medium ${
-                  selectedCollocateDevices.length > 0 && endDate && startDate
-                    ? 'cursor-pointer'
-                    : 'opacity-40 cursor-not-allowed'
-                }`}
-                onClick={handleCollocation}
-              >
-                Start collocation
-              </Button>
-            </div>
-          </NavigationBreadCrumb>
           <ContentBox>
             <div className='grid grid-cols-1 md:grid-cols-3'>
               {/* DEVICE TABLE */}
