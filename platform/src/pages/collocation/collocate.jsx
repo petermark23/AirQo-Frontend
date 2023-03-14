@@ -1,5 +1,5 @@
 import React from 'react';
-import HeaderNav from '../../common/components/Collocation/header';
+import HeaderNav from '../../common/components/Layout/header';
 import Layout from '../../common/components/Layout';
 import Collocate from '@/icons/Collocation/collocate.svg';
 import BoxedAddIcon from '@/icons/Actions/addBoxed.svg';
@@ -10,7 +10,7 @@ import ContentBox from '../../common/components/Layout/content_box';
 const collocate = () => {
   return (
     <Layout>
-      <HeaderNav component={'Collocate'} />
+      <HeaderNav category={'Collocation'} component={'Collocate'} />
       <ContentBox>
         <div className='flex justify-center items-center flex-col mx-auto py-20'>
           <Collocate />
