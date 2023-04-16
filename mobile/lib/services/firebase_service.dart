@@ -184,7 +184,7 @@ class CloudStore {
     return kya;
   }
 
-  static Future<List<AppNotification>> getNotifications() async {
+  static Future<List<UserNotification>> getNotifications() async {
     final userId = CustomAuth.getUserId();
     if (userId.isEmpty) {
       return [];
@@ -197,13 +197,11 @@ class CloudStore {
           .collection(userId)
           .get();
 
-      final notifications = <AppNotification>[];
+      final notifications = <UserNotification>[];
 
       for (final doc in notificationsJson.docs) {
         try {
-          notifications.add(AppNotification.fromJson(
-            doc.data(),
-          ));
+          notifications.add(UserNotification.fromJson(doc.data()));
         } catch (e) {
           debugPrint(e.toString());
         }

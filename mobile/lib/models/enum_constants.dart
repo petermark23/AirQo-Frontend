@@ -2,9 +2,6 @@ import 'package:app/themes/theme.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-
-part 'enum_constants.g.dart';
 
 enum Environment { dev, prod }
 
@@ -110,14 +107,9 @@ enum FirebaseAuthError {
   String toString() => message;
 }
 
-@HiveType(typeId: 110, adapterName: 'AppNotificationTypeAdapter')
-enum AppNotificationType {
-  @HiveField(0)
-  appUpdate,
-  @HiveField(1)
-  reminder,
-  @HiveField(2)
-  welcomeMessage,
+enum NotificationType {
+  message,
+  alert,
 }
 
 enum AirQuality {

@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                             index: 2,
                           ),
                         ),
-                        BlocBuilder<NotificationBloc, List<AppNotification>>(
+                        BlocBuilder<NotificationBloc, List<UserNotification>>(
                           builder: (context, state) {
                             return Positioned(
                               right: 0.0,

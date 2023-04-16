@@ -353,7 +353,7 @@ class ViewNotificationIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NotificationBloc, List<AppNotification>>(
+    return BlocBuilder<NotificationBloc, List<UserNotification>>(
       builder: (context, state) {
         return GestureDetector(
           onTap: () async {

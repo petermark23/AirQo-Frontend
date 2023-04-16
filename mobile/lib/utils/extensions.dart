@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app/constants/constants.dart';
 import 'package:app/models/models.dart';
+import 'package:app/models/notification.dart' as app_notification;
 import 'package:app/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -124,8 +125,36 @@ extension KyaListExt on List<Kya> {
   }
 }
 
-extension AppNotificationListExt on List<AppNotification> {
-  List<AppNotification> filterUnRead() {
+extension NotificationExt on app_notification.UserNotification {
+  String displayDate() {
+    if (time.day == DateTime.now().day) {
+      var hours = time.hour.toString();
+      if (hours.length <= 1) {
+        hours = '0${time.hour}';
+      }
+
+      var minutes = time.minute.toString();
+      if (minutes.length <= 1) {
+        minutes = '0$minutes';
+      }
+
+      return '$hours:$minutes';
+    } else {
+      return '${time.day} ${time.getMonthString(abbreviate: true)}';
+    }
+  }
+}
+
+extension NotificationListExt on List<app_notification.UserNotification> {
+  void sortByTime() {
+    sort(
+      (x, y) {
+        return -(x.time.compareTo(y.time));
+      },
+    );
+  }
+
+  List<app_notification.UserNotification> filterUnRead() {
     return where((element) => !element.read).toList();
   }
 }
@@ -684,24 +713,6 @@ extension DateTimeExt on DateTime {
 
     return formatter.parse(formatter.format(this)).compareTo(yesterdayDate) ==
         0;
-  }
-
-  String notificationDisplayDate() {
-    if (day == DateTime.now().day) {
-      var hours = hour.toString();
-      if (hours.length <= 1) {
-        hours = '0$hour';
-      }
-
-      var minutes = minute.toString();
-      if (minutes.length <= 1) {
-        minutes = '0$minutes';
-      }
-
-      return '$hours:$minutes';
-    } else {
-      return '$day ${getMonthString(abbreviate: true)}';
-    }
   }
 
   DateTime tomorrow() {

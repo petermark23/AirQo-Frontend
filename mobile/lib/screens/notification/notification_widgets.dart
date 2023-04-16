@@ -7,11 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class NotificationView extends StatefulWidget {
-  const NotificationView({
-    super.key,
-    required this.appNotification,
-  });
-  final AppNotification appNotification;
+  const NotificationView(this.userNotification, {super.key});
+  final UserNotification userNotification;
 
   @override
   State<NotificationView> createState() => _NotificationViewState();
@@ -82,7 +79,7 @@ class _NotificationViewState extends State<NotificationView> {
                                 shape: BoxShape.circle,
                               ),
                               child: SvgPicture.asset(
-                                widget.appNotification.icon,
+                                widget.userNotification.image,
                                 height: 24,
                                 width: 36,
                               ),
@@ -91,7 +88,7 @@ class _NotificationViewState extends State<NotificationView> {
                               height: 17,
                             ),
                             AutoSizeText(
-                              widget.appNotification.title,
+                              widget.userNotification.title,
                               textAlign: TextAlign.center,
                               style: CustomTextStyle.headline10(context),
                             ),
@@ -99,7 +96,7 @@ class _NotificationViewState extends State<NotificationView> {
                               height: 8.0,
                             ),
                             AutoSizeText(
-                              widget.appNotification.body,
+                              widget.userNotification.body,
                               textAlign: TextAlign.center,
                               maxLines: 4,
                               style: Theme.of(context)
@@ -126,11 +123,8 @@ class _NotificationViewState extends State<NotificationView> {
 }
 
 class NotificationCard extends StatelessWidget {
-  const NotificationCard({
-    super.key,
-    required this.appNotification,
-  });
-  final AppNotification appNotification;
+  const NotificationCard(this.userNotification, {super.key});
+  final UserNotification userNotification;
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +146,7 @@ class NotificationCard extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: SvgPicture.asset(
-              appNotification.icon,
+              userNotification.image,
               height: 16,
               width: 24,
               semanticsLabel: 'notification_icon',
@@ -166,13 +160,13 @@ class NotificationCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AutoSizeText(
-                  appNotification.title,
+                  userNotification.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: CustomTextStyle.button2(context),
                 ),
                 AutoSizeText(
-                  appNotification.subTitle,
+                  userNotification.subTitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -186,7 +180,7 @@ class NotificationCard extends StatelessWidget {
             width: 12,
           ),
           Visibility(
-            visible: !appNotification.read,
+            visible: !userNotification.read,
             child: Container(
               padding: const EdgeInsets.fromLTRB(8.0, 1.0, 8.0, 1.0),
               constraints: const BoxConstraints(
@@ -206,7 +200,7 @@ class NotificationCard extends StatelessWidget {
             ),
           ),
           Visibility(
-            visible: appNotification.read,
+            visible: userNotification.read,
             child: Container(
               constraints: const BoxConstraints(
                 maxHeight: 16,
@@ -215,7 +209,7 @@ class NotificationCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    appNotification.dateTime.notificationDisplayDate(),
+                    userNotification.displayDate(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

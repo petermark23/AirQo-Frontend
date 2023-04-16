@@ -14,7 +14,7 @@ class NotificationPage extends StatelessWidget {
     return Scaffold(
       appBar: const AppTopBar('Notifications'),
       body: AppSafeArea(
-        child: BlocBuilder<NotificationBloc, List<AppNotification>>(
+        child: BlocBuilder<NotificationBloc, List<UserNotification>>(
           builder: (context, state) {
             if (state.isEmpty) {
               context.read<NotificationBloc>().add(const SyncNotifications());
@@ -34,16 +34,12 @@ class NotificationPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return NotificationView(
-                                appNotification: state[index],
-                              );
+                              return NotificationView(state[index]);
                             },
                           ),
                         );
                       },
-                      child: NotificationCard(
-                        appNotification: state[index],
-                      ),
+                      child: NotificationCard(state[index]),
                     ),
                   );
                 },

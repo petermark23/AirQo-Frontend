@@ -2,73 +2,51 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'enum_constants.dart';
-import 'json_parsers.dart';
 
 part 'notification.g.dart';
 
 @JsonSerializable()
-class AppNotification extends Equatable {
-  factory AppNotification.fromJson(Map<String, dynamic> json) =>
-      _$AppNotificationFromJson(json);
+class UserNotification extends Equatable {
+  factory UserNotification.fromJson(Map<String, dynamic> json) =>
+      _$UserNotificationFromJson(json);
 
-  AppNotification({
+  const UserNotification({
     required this.id,
     required this.title,
     required this.subTitle,
-    required this.link,
-    required this.icon,
     required this.image,
     required this.body,
     required this.read,
+    required this.time,
     required this.type,
-    DateTime? dateTime,
-  }) : dateTime = dateTime ?? DateTime.now();
+  });
 
+  @JsonKey()
   final String id;
 
+  @JsonKey()
   final String title;
 
+  @JsonKey(name: "sub_title", defaultValue: "")
   final String subTitle;
 
-  final String link;
-
-  @JsonKey(fromJson: notificationIconFromJson, toJson: notificationIconToJson)
-  final String icon;
-
+  @JsonKey(defaultValue: "")
   final String image;
 
+  @JsonKey()
   final String body;
 
-  final DateTime dateTime;
+  @JsonKey()
+  final DateTime time;
 
+  @JsonKey(defaultValue: false)
   final bool read;
 
-  final AppNotificationType type;
+  @JsonKey()
+  final NotificationType type;
 
-  Map<String, dynamic> toJson() => _$AppNotificationToJson(this);
-
-  static List<AppNotification> sort(List<AppNotification> notifications) {
-    notifications.sort(
-      (x, y) {
-        return -(x.dateTime.compareTo(y.dateTime));
-      },
-    );
-
-    return notifications;
-  }
+  Map<String, dynamic> toJson() => _$UserNotificationToJson(this);
 
   @override
-  List<Object?> get props => [id];
-}
-
-@JsonSerializable(explicitToJson: true)
-class AppNotificationList {
-  factory AppNotificationList.fromJson(Map<String, dynamic> json) =>
-      _$AppNotificationListFromJson(json);
-
-  AppNotificationList({required this.data});
-
-  List<AppNotification> data;
-
-  Map<String, dynamic> toJson() => _$AppNotificationListToJson(this);
+  List<Object?> get props => [id, read,];
 }

@@ -8,7 +8,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 part 'notification_event.dart';
 
 class NotificationBloc
-    extends HydratedBloc<NotificationEvent, List<AppNotification>> {
+    extends HydratedBloc<NotificationEvent, List<UserNotification>> {
   NotificationBloc() : super([]) {
     on<ClearNotifications>(_onClearNotifications);
     on<SyncNotifications>(_onSyncNotifications);
@@ -16,32 +16,40 @@ class NotificationBloc
 
   Future<void> _onSyncNotifications(
     SyncNotifications _,
-    Emitter<List<AppNotification>> emit,
+    Emitter<List<UserNotification>> emit,
   ) async {
-    List<AppNotification> notifications = await CloudStore.getNotifications();
+    Set<UserNotification> notificationsSet = state.toSet();
 
-    Set<AppNotification> notificationsSet = state.toSet();
+    List<UserNotification> notifications = await CloudStore.getNotifications();
+
+    if (notifications.isNotEmpty) {
+      notificationsSet
+          .retainWhere((element) => notifications.contains(element));
+    }
     notificationsSet.addAll(notifications.toSet());
-
     emit(notificationsSet.toList());
-
-    emit(notifications);
   }
 
   void _onClearNotifications(
     ClearNotifications _,
-    Emitter<List<AppNotification>> emit,
+    Emitter<List<UserNotification>> emit,
   ) {
     emit([]);
   }
 
   @override
-  List<AppNotification>? fromJson(Map<String, dynamic> json) {
-    return AppNotificationList.fromJson(json).data;
+  List<UserNotification>? fromJson(Map<String, dynamic> json) {
+    List<Map<String, dynamic>> notifications =
+        json["notifications"] as List<Map<String, dynamic>>;
+    return notifications.map((e) => UserNotification.fromJson(e)).toList();
   }
 
   @override
-  Map<String, dynamic>? toJson(List<AppNotification> state) {
-    return AppNotificationList(data: state).toJson();
+  Map<String, dynamic>? toJson(List<UserNotification> state) {
+    List<Map<String, dynamic>> notifications =
+        state.map((e) => e.toJson()).toList();
+    return {
+      "notifications": notifications,
+    };
   }
 }

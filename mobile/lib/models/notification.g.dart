@@ -6,51 +6,31 @@ part of 'notification.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-AppNotification _$AppNotificationFromJson(Map<String, dynamic> json) =>
-    AppNotification(
+UserNotification _$UserNotificationFromJson(Map<String, dynamic> json) =>
+    UserNotification(
       id: json['id'] as String,
       title: json['title'] as String,
-      subTitle: json['subTitle'] as String,
-      link: json['link'] as String,
-      icon: notificationIconFromJson(json['icon']),
-      image: json['image'] as String,
+      subTitle: json['sub_title'] as String? ?? '',
+      image: json['image'] as String? ?? '',
       body: json['body'] as String,
-      read: json['read'] as bool,
-      type: $enumDecode(_$AppNotificationTypeEnumMap, json['type']),
-      dateTime: json['dateTime'] == null
-          ? null
-          : DateTime.parse(json['dateTime'] as String),
+      read: json['read'] as bool? ?? false,
+      time: DateTime.parse(json['time'] as String),
+      type: $enumDecode(_$NotificationTypeEnumMap, json['type']),
     );
 
-Map<String, dynamic> _$AppNotificationToJson(AppNotification instance) =>
+Map<String, dynamic> _$UserNotificationToJson(UserNotification instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
-      'subTitle': instance.subTitle,
-      'link': instance.link,
-      'icon': notificationIconToJson(instance.icon),
+      'sub_title': instance.subTitle,
       'image': instance.image,
       'body': instance.body,
-      'dateTime': instance.dateTime.toIso8601String(),
+      'time': instance.time.toIso8601String(),
       'read': instance.read,
-      'type': _$AppNotificationTypeEnumMap[instance.type]!,
+      'type': _$NotificationTypeEnumMap[instance.type]!,
     };
 
-const _$AppNotificationTypeEnumMap = {
-  AppNotificationType.appUpdate: 'appUpdate',
-  AppNotificationType.reminder: 'reminder',
-  AppNotificationType.welcomeMessage: 'welcomeMessage',
+const _$NotificationTypeEnumMap = {
+  NotificationType.message: 'message',
+  NotificationType.alert: 'alert',
 };
-
-AppNotificationList _$AppNotificationListFromJson(Map<String, dynamic> json) =>
-    AppNotificationList(
-      data: (json['data'] as List<dynamic>)
-          .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$AppNotificationListToJson(
-        AppNotificationList instance) =>
-    <String, dynamic>{
-      'data': instance.data.map((e) => e.toJson()).toList(),
-    };
