@@ -27,7 +27,7 @@ const PermissionDenied = () => {
       <Grid container justify="center" spacing={4}>
         <Grid item lg={6} xs={12}>
           <div className={classes.content}>
-            <Typography variant="h2">404: You don't have access rights to this page.</Typography>
+            <Typography variant="h2">403: You don't have access rights to this page.</Typography>
             <Typography variant="subtitle2">
               Reach out to your administrator for access. Try using the{' '}
               <Link to="/dashboard">navigation</Link>
