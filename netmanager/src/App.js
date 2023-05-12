@@ -1,21 +1,21 @@
 /* eslint-disable */
-import React from "react";
-import "./App.css";
+import React from 'react';
+import './App.css';
 
-import jwt_decode from "jwt-decode";
-import setAuthToken from "./utils/setAuthToken";
-import { setCurrentUser, logoutUser } from "./redux/Join/actions";
+import jwt_decode from 'jwt-decode';
+import setAuthToken from './utils/setAuthToken';
+import { setCurrentUser, logoutUser } from './redux/Join/actions';
 
-import { Provider } from "react-redux";
-import store from "./store";
-import { ThemeProvider } from "@material-ui/styles";
-import theme from "./assets/theme";
-import { setOrganization } from "./redux/Join/actions";
-import { setDefaultAirQloud } from "./redux/AirQloud/operations";
-import { loadSites } from "./redux/Dashboard/operations";
-import AppRoutes from "./AppRoutes";
-import { loadPM25HeatMapData, loadPM25SensorData } from "./redux/MapData/operations";
-
+import { Provider } from 'react-redux';
+import store from './store';
+import { ThemeProvider } from '@material-ui/styles';
+import theme from './assets/theme';
+import { setOrganization } from './redux/Join/actions';
+import { setDefaultAirQloud } from './redux/AirQloud/operations';
+import { loadSites } from './redux/Dashboard/operations';
+import AppRoutes from './AppRoutes';
+import { loadPM25HeatMapData, loadPM25SensorData } from './redux/MapData/operations';
+import { isEmpty } from 'underscore';
 
 // Check for token to keep user logged in
 if (localStorage.jwtToken) {
@@ -35,18 +35,24 @@ if (localStorage.jwtToken) {
   store.dispatch(setCurrentUser(currentUser));
   // Check for expired token
   const currentTime = Date.now() / 1000; // to get in milliseconds
+  const activeNetwork = JSON.parse(localStorage.getItem('activeNetwork') || {});
+  if (isEmpty(activeNetwork)) {
+    store.dispatch(logoutUser());
+    window.location.href = './';
+  }
+
   if (decoded.exp < currentTime) {
     // Logout user
     store.dispatch(logoutUser());
     // Redirect to the landing page
-    window.location.href = "./";
+    window.location.href = './';
   }
   store.dispatch(setOrganization());
   store.dispatch(setDefaultAirQloud());
   store.dispatch(loadSites());
   store.dispatch(loadPM25HeatMapData());
   store.dispatch(loadPM25SensorData());
-} else{
+} else {
   store.dispatch(setOrganization());
   store.dispatch(setDefaultAirQloud());
   store.dispatch(loadSites());
@@ -55,7 +61,6 @@ if (localStorage.jwtToken) {
 }
 
 const App = () => {
-
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
@@ -63,5 +68,5 @@ const App = () => {
       </ThemeProvider>
     </Provider>
   );
-}
+};
 export default App;
