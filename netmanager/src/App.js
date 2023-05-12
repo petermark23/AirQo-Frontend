@@ -15,7 +15,6 @@ import { setDefaultAirQloud } from './redux/AirQloud/operations';
 import { loadSites } from './redux/Dashboard/operations';
 import AppRoutes from './AppRoutes';
 import { loadPM25HeatMapData, loadPM25SensorData } from './redux/MapData/operations';
-import { isEmpty } from 'underscore';
 
 // Check for token to keep user logged in
 if (localStorage.jwtToken) {
@@ -35,11 +34,6 @@ if (localStorage.jwtToken) {
   store.dispatch(setCurrentUser(currentUser));
   // Check for expired token
   const currentTime = Date.now() / 1000; // to get in milliseconds
-  const activeNetwork = JSON.parse(localStorage.getItem('activeNetwork') || {});
-  if (isEmpty(activeNetwork)) {
-    store.dispatch(logoutUser());
-    window.location.href = './';
-  }
 
   if (decoded.exp < currentTime) {
     // Logout user
