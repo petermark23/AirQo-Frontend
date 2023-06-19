@@ -14,6 +14,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { useInitScrollTop } from 'utils/customHooks';
 import { ErrorBoundary } from '../../ErrorBoundary';
 import { useDashboardSitesData } from 'redux/Dashboard/selectors';
+import { loadSites } from 'redux/Dashboard/operations';
 import { useOrgData } from 'redux/Join/selectors';
 
 // css
@@ -202,6 +203,44 @@ const PollutantSelector = ({ className, onChange, showHeatMap }) => {
   );
 };
 
+const MapStyleSelectorPlaceholder = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleClick = () => {
+    setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleHover = (isHovered) => {
+    setIsHovered(isHovered);
+  };
+
+  return (
+    <div ref={dropdownRef} className="map-style-placeholder" onClick={handleClick} onMouseEnter={() => handleHover(true)} onMouseLeave={() => handleHover(false)}>
+      <div className={`map-icon-container${isHovered ? ' map-icon-hovered' : ''}`}>
+        <MapIcon className="map-icon" />
+      </div>
+      {isOpen && <MapStyleSelector />}
+    </div>
+  );
+};
+
+
 const MapStyleSelector = () => {
   const styleSet = [
     {
@@ -239,14 +278,11 @@ const MapStyleSelector = () => {
   return (
     <>
       <div className="map-style">
-        <h4>
-          <MapIcon />
-          <span>Change Map Mode</span>
-        </h4>
         <div className="map-style-cards">
           {styleSet.map((style) => {
             return (
               <div
+                key={style.name}
                 onClick={() => {
                   localStorage.mapStyle = style.mapStyle;
                   localStorage.mapMode = style.name;
@@ -333,12 +369,13 @@ const CustomMapControl = ({
         onChange={onPollutantChange}
         showHeatMap={showHeatmap}
       />
-      <MapStyleSelector />
+      <MapStyleSelectorPlaceholder />
     </MapControllerPosition>
   );
 };
 
 export const OverlayMap = ({ center, zoom, heatMapData, monitoringSiteData }) => {
+  const dispatch = useDispatch();
   const sitesData = useDashboardSitesData();
   const MAX_OFFLINE_DURATION = 86400; // 24 HOURS
   const mapContainerRef = useRef(null);
@@ -355,6 +392,20 @@ export const OverlayMap = ({ center, zoom, heatMapData, monitoringSiteData }) =>
     closeButton: false,
     offset: 25
   });
+
+  useEffect(() => {
+    setShowPollutant({
+      pm2_5: localStorage.pollutant === 'pm2_5',
+      no2: localStorage.pollutant === 'no2',
+      pm10: localStorage.pollutant === 'pm10'
+    });
+  }, [localStorage.pollutant]);
+
+  useEffect(() => {
+    if (isEmpty(sitesData)) {
+      dispatch(loadSites());
+    }
+  }, [sitesData]);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -478,6 +529,7 @@ export const OverlayMap = ({ center, zoom, heatMapData, monitoringSiteData }) =>
     <div className="overlay-map-container" ref={mapContainerRef}>
       {showSensors &&
         map &&
+        monitoringSiteData.features.length > 0 &&
         monitoringSiteData.features.forEach((feature) => {
           const [seconds, duration] = getFirstDuration(feature.properties.time);
           let pollutantValue =
@@ -537,11 +589,11 @@ export const OverlayMap = ({ center, zoom, heatMapData, monitoringSiteData }) =>
                         }</b>
                       </span>
                     </div>
-                    <div class="${'popup-aqi ' + markerClass}"> 
+                    <div class="${`popup-aqi ${markerClass}`}"> 
                       <span>
                       ${
-                        (showPollutant.pm2_5 && feature.properties.pm2_5 && 'PM<sub>2.5<sub>') ||
-                        (showPollutant.pm10 && feature.properties.pm10 && 'PM<sub>10<sub>')
+                        (showPollutant.pm2_5 && 'PM<sub>2.5<sub>') ||
+                        (showPollutant.pm10 && 'PM<sub>10<sub>')
                       }
                       </span> </hr>  
                       <div class="pollutant-info">
@@ -587,6 +639,9 @@ const MapContainer = () => {
     if (isEmpty(heatMapData.features)) {
       dispatch(loadPM25HeatMapData());
     }
+  }, [heatMapData]);
+
+  useEffect(() => {
     if (isEmpty(monitoringSiteData.features)) {
       dispatch(loadMapEventsData({ recent: 'yes', external: 'no' }));
     }

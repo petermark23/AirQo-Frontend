@@ -1,4 +1,5 @@
 import 'package:app/models/enum_constants.dart';
+import 'package:app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -360,7 +361,7 @@ ThemeData customTheme() {
     primaryColor: Colors.white,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     textTheme: TextTheme(
-      headline1: TextStyle(
+      displayLarge: TextStyle(
         fontSize: 80.0,
         fontWeight: FontWeight.w700,
         fontStyle: FontStyle.normal,
@@ -368,7 +369,7 @@ ThemeData customTheme() {
         height: 88.0 / 80.0,
         letterSpacing: 16 * -0.01,
       ),
-      headline2: TextStyle(
+      displayMedium: TextStyle(
         fontSize: 64.0,
         fontWeight: FontWeight.w700,
         fontStyle: FontStyle.normal,
@@ -376,7 +377,7 @@ ThemeData customTheme() {
         height: 72.0 / 64.0,
         letterSpacing: 16 * -0.01,
       ),
-      headline3: TextStyle(
+      displaySmall: TextStyle(
         fontSize: 56.0,
         fontWeight: FontWeight.w700,
         fontStyle: FontStyle.normal,
@@ -384,7 +385,7 @@ ThemeData customTheme() {
         height: 64.0 / 56.0,
         letterSpacing: 16 * -0.01,
       ),
-      headline4: TextStyle(
+      headlineMedium: TextStyle(
         fontSize: 48.0,
         fontWeight: FontWeight.w700,
         fontStyle: FontStyle.normal,
@@ -392,7 +393,7 @@ ThemeData customTheme() {
         height: 56.0 / 48.0,
         letterSpacing: 16 * -0.01,
       ),
-      headline5: TextStyle(
+      headlineSmall: TextStyle(
         fontSize: 40.0,
         fontWeight: FontWeight.w700,
         fontStyle: FontStyle.normal,
@@ -400,7 +401,7 @@ ThemeData customTheme() {
         height: 48.0 / 40.0,
         letterSpacing: 16 * -0.01,
       ),
-      headline6: TextStyle(
+      titleLarge: TextStyle(
         fontSize: 32.0,
         fontWeight: FontWeight.w700,
         fontStyle: FontStyle.normal,
@@ -408,28 +409,28 @@ ThemeData customTheme() {
         height: 40.0 / 32.0,
         letterSpacing: 16 * -0.01,
       ),
-      bodyText1: TextStyle(
+      bodyLarge: TextStyle(
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
         color: CustomColors.appColorBlack,
         height: 24.0 / 16.0,
       ),
-      bodyText2: TextStyle(
+      bodyMedium: TextStyle(
         fontSize: 14.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
         color: CustomColors.appColorBlack,
         height: 18.0 / 14.0,
       ),
-      caption: TextStyle(
+      bodySmall: TextStyle(
         fontSize: 12.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
         color: CustomColors.appColorBlack,
         height: 16.0 / 12.0,
       ),
-      overline: TextStyle(
+      labelSmall: TextStyle(
         fontSize: 8.0,
         fontWeight: FontWeight.w500,
         fontStyle: FontStyle.normal,
@@ -437,14 +438,14 @@ ThemeData customTheme() {
         height: 12.0 / 8.0,
         letterSpacing: 16 * -0.24,
       ),
-      subtitle1: TextStyle(
+      titleMedium: TextStyle(
         fontSize: 16.0,
         fontWeight: FontWeight.normal,
         fontStyle: FontStyle.normal,
         color: CustomColors.appColorBlack,
         height: 24.0 / 16.0,
       ),
-      subtitle2: TextStyle(
+      titleSmall: TextStyle(
         fontSize: 14.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
@@ -497,12 +498,60 @@ ThemeData customTheme() {
         aqiMaroonTextColor: Color(0xffDBA5B2),
       ),
     ],
+    inputDecorationTheme: ThemeData.light().inputDecorationTheme.copyWith(
+          contentPadding: const EdgeInsets.fromLTRB(16, 12, 0, 12),
+          filled: true,
+          hintStyle: ThemeData.light().textTheme.bodyLarge?.copyWith(
+                color: CustomColors.appColorBlack.withOpacity(0.32),
+              ),
+          prefixStyle: ThemeData.light().textTheme.bodyLarge?.copyWith(
+                color: CustomColors.appColorBlack.withOpacity(0.32),
+              ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: CustomColors.greyColor.withOpacity(0.7),
+              width: 1.0,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: CustomColors.greyColor.withOpacity(0.7),
+              width: 1.0,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: CustomColors.greyColor.withOpacity(0.7),
+              width: 1.0,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: CustomColors.appColorInvalid,
+              width: 1.0,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: CustomColors.appColorInvalid,
+              width: 1.0,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          errorStyle: const TextStyle(
+            fontSize: 0,
+          ),
+        ),
   );
 }
 
 class CustomTextStyle {
   static TextStyle? bodyText4(BuildContext context) {
-    return Theme.of(context).textTheme.bodyText2?.copyWith(
+    return Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: 14.0,
           fontWeight: FontWeight.w500,
           fontStyle: FontStyle.normal,
@@ -511,7 +560,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? button1(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 14.0,
           fontWeight: FontWeight.w400,
           fontStyle: FontStyle.normal,
@@ -520,7 +569,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? newNotification(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 10.0,
           fontWeight: FontWeight.w500,
           fontStyle: FontStyle.normal,
@@ -530,7 +579,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? button2(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 14.0,
           fontWeight: FontWeight.w500,
           fontStyle: FontStyle.normal,
@@ -539,7 +588,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? caption3(BuildContext context) {
-    return Theme.of(context).textTheme.caption?.copyWith(
+    return Theme.of(context).textTheme.bodySmall?.copyWith(
           fontWeight: FontWeight.w500,
           fontSize: 12.0,
           height: 16.0 / 12.0,
@@ -547,14 +596,14 @@ class CustomTextStyle {
   }
 
   static TextStyle? caption4(BuildContext context) {
-    return Theme.of(context).textTheme.caption?.copyWith(
+    return Theme.of(context).textTheme.bodySmall?.copyWith(
           fontSize: 12.0,
           height: 16.0 / 12.0,
         );
   }
 
   static TextStyle? headline10(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 16.0,
           fontWeight: FontWeight.w700,
           fontStyle: FontStyle.normal,
@@ -563,7 +612,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? headline11(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 28.0,
           fontWeight: FontWeight.w700,
           fontStyle: FontStyle.normal,
@@ -573,7 +622,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? headline7(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 24.0,
           fontWeight: FontWeight.w700,
           fontStyle: FontStyle.normal,
@@ -582,7 +631,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? errorTitle(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 21.0,
           fontWeight: FontWeight.w700,
           fontStyle: FontStyle.normal,
@@ -591,7 +640,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? errorSubTitle(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 15.0,
           fontWeight: FontWeight.w400,
           fontStyle: FontStyle.normal,
@@ -601,7 +650,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? headline8(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 16.0,
           fontWeight: FontWeight.w700,
           fontStyle: FontStyle.normal,
@@ -610,7 +659,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? headline9(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 20.0,
           fontWeight: FontWeight.w700,
           fontStyle: FontStyle.normal,
@@ -619,7 +668,7 @@ class CustomTextStyle {
   }
 
   static TextStyle? airQualityChip(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontSize: 7.0,
           fontWeight: FontWeight.w400,
           fontStyle: FontStyle.normal,
@@ -627,9 +676,9 @@ class CustomTextStyle {
         );
   }
 
-  static TextStyle? insightsAvatar({
+  static TextStyle? airQualityValue({
     required Pollutant pollutant,
-    required double value,
+    required double? value,
   }) {
     return GoogleFonts.robotoMono(
       color: pollutant.textColor(
@@ -644,12 +693,179 @@ class CustomTextStyle {
   }
 
   static TextStyle? overline1(BuildContext context) {
-    return Theme.of(context).textTheme.headline6?.copyWith(
+    return Theme.of(context).textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.w400,
           fontStyle: FontStyle.normal,
           fontSize: 10.0,
           height: 14.0 / 10.0,
           color: Colors.white,
         );
+  }
+}
+
+InputDecoration inputDecoration(
+  AuthenticationStatus authStatus, {
+  required String hintText,
+  required Function() suffixIconCallback,
+  String? prefixText,
+}) {
+  Color formColor;
+  Color fillColor;
+  Color textColor;
+  Color suffixIconColor;
+  Widget suffixIcon;
+
+  switch (authStatus) {
+    case AuthenticationStatus.initial:
+      formColor = CustomColors.appColorBlue;
+      textColor = CustomColors.appColorBlack;
+      suffixIconColor = CustomColors.greyColor.withOpacity(0.7);
+      fillColor = Colors.transparent;
+      suffixIcon = TextInputCloseButton(
+        color: suffixIconColor,
+      );
+
+      break;
+    case AuthenticationStatus.error:
+      formColor = CustomColors.appColorInvalid;
+      textColor = CustomColors.appColorInvalid;
+      suffixIconColor = CustomColors.appColorInvalid;
+      fillColor = CustomColors.appColorInvalid.withOpacity(0.1);
+      suffixIcon = TextInputCloseButton(
+        color: suffixIconColor,
+      );
+      break;
+    case AuthenticationStatus.success:
+      formColor = CustomColors.appColorValid;
+      textColor = CustomColors.appColorValid;
+      suffixIconColor = CustomColors.appColorValid;
+      fillColor = CustomColors.appColorValid.withOpacity(0.05);
+      suffixIcon = const Padding(
+        padding: EdgeInsets.all(14),
+        child: Icon(
+          Icons.check_circle_rounded,
+        ),
+      );
+      break;
+  }
+
+  InputBorder inputBorder = OutlineInputBorder(
+    borderSide: BorderSide(color: formColor, width: 1.0),
+    borderRadius: BorderRadius.circular(8.0),
+  );
+
+  return InputDecoration(
+    contentPadding: const EdgeInsets.fromLTRB(16, 12, 0, 12),
+    iconColor: formColor,
+    fillColor: fillColor,
+    filled: true,
+    focusedBorder: inputBorder,
+    enabledBorder: inputBorder,
+    border: inputBorder,
+    suffixIconColor: formColor,
+    hintText: hintText,
+    prefixIcon: prefixText == null
+        ? null
+        : Padding(
+            padding: const EdgeInsets.fromLTRB(8, 11, 0, 15),
+            child: Text(
+              '$prefixText ',
+              style: customTheme().textTheme.bodyLarge?.copyWith(
+                    color: textColor,
+                  ),
+            ),
+          ),
+    hintStyle: customTheme().textTheme.bodyLarge?.copyWith(
+          color: CustomColors.appColorBlack.withOpacity(0.32),
+        ),
+    prefixStyle: customTheme().textTheme.bodyLarge?.copyWith(
+          color: CustomColors.appColorBlack.withOpacity(0.32),
+        ),
+    suffixIcon: GestureDetector(
+      onTap: () {
+        if (authStatus != AuthenticationStatus.success) {
+          suffixIconCallback();
+        }
+      },
+      child: suffixIcon,
+    ),
+    errorStyle: const TextStyle(
+      fontSize: 0,
+    ),
+  );
+}
+
+InputDecoration optInputDecoration(
+  AuthenticationStatus authStatus, {
+  required bool codeSent,
+}) {
+  Color fillColor;
+  Color textColor;
+
+  switch (authStatus) {
+    case AuthenticationStatus.initial:
+      if (!codeSent) {
+        fillColor = const Color(0xff8D8D8D).withOpacity(0.1);
+        textColor = Colors.transparent;
+        break;
+      }
+      fillColor = Colors.transparent;
+      textColor = CustomColors.appColorBlue;
+      break;
+    case AuthenticationStatus.error:
+      textColor = CustomColors.appColorInvalid;
+      fillColor = CustomColors.appColorInvalid.withOpacity(0.05);
+      break;
+    case AuthenticationStatus.success:
+      textColor = CustomColors.appColorValid;
+      fillColor = textColor.withOpacity(0.05);
+      break;
+  }
+
+  InputBorder inputBorder = OutlineInputBorder(
+    borderSide: BorderSide(color: textColor, width: 1.0),
+    borderRadius: BorderRadius.circular(8.0),
+  );
+
+  return InputDecoration(
+    contentPadding: const EdgeInsets.symmetric(
+      vertical: 10,
+      horizontal: 0,
+    ),
+    iconColor: textColor,
+    fillColor: fillColor,
+    filled: true,
+    focusedBorder: inputBorder,
+    enabledBorder: inputBorder,
+    disabledBorder: inputBorder,
+    errorBorder: inputBorder,
+    border: inputBorder,
+    counter: const Offstage(),
+    errorStyle: const TextStyle(
+      fontSize: 0,
+    ),
+  );
+}
+
+TextStyle? inputTextStyle(
+  AuthenticationStatus authStatus, {
+  bool optField = false,
+}) {
+  TextStyle? textStyle = customTheme().textTheme.bodyLarge;
+  if (optField) {
+    textStyle = textStyle?.copyWith(
+      fontSize: 32,
+      fontWeight: FontWeight.w500,
+      letterSpacing: 16 * 0.41,
+      height: 40 / 32,
+    );
+  }
+  switch (authStatus) {
+    case AuthenticationStatus.initial:
+      return textStyle?.copyWith(color: CustomColors.appColorBlack);
+    case AuthenticationStatus.error:
+      return textStyle?.copyWith(color: CustomColors.appColorInvalid);
+    case AuthenticationStatus.success:
+      return textStyle?.copyWith(color: CustomColors.appColorValid);
   }
 }

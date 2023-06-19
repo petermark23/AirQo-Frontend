@@ -1,11 +1,15 @@
 import 'package:app/models/models.dart';
+import 'package:app/services/services.dart';
 import 'package:app/themes/theme.dart';
-import 'package:app/utils/pm.dart';
+import 'package:app/utils/utils.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import '../screens/home_page.dart';
+import 'custom_shimmer.dart';
 
 Future<void> openPhoneSettings(BuildContext context, String message) async {
   final confirmation = await showDialog<ConfirmationAction>(
@@ -316,6 +320,161 @@ void showSnackBar(
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
+void showFavouritePlaceSnackBar(
+  BuildContext context,
+  AirQualityReading airQualityReading, {
+  int durationInSeconds = 2,
+}) {
+  final snackBar = SnackBar(
+    duration: Duration(seconds: durationInSeconds),
+    elevation: 0,
+    padding: const EdgeInsets.symmetric(
+      vertical: 17,
+      horizontal: 22,
+    ),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(28.0),
+      ),
+    ),
+    behavior: SnackBarBehavior.floating,
+    content: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          height: 23,
+          width: 23,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Pollutant.pm2_5.color(
+              airQualityReading.pm2_5,
+            ),
+            border: const Border.fromBorderSide(
+              BorderSide(color: Colors.transparent),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Spacer(),
+              SvgPicture.asset(
+                Pollutant.pm2_5.svg,
+                semanticsLabel: 'Pm2.5',
+                height: 3,
+                width: 8,
+                colorFilter: ColorFilter.mode(
+                  Pollutant.pm2_5.textColor(
+                    value: airQualityReading.pm2_5,
+                  ),
+                  BlendMode.srcIn,
+                ),
+              ),
+              Text(
+                airQualityReading.pm2_5.toInt().toString(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: CustomTextStyle.airQualityValue(
+                  pollutant: Pollutant.pm2_5,
+                  value: airQualityReading.pm2_5,
+                )?.copyWith(
+                  fontStyle: FontStyle.normal,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  height: 12 / 9,
+                  letterSpacing: 16 * -0.022,
+                ),
+              ),
+              SvgPicture.asset(
+                'assets/icon/unit.svg',
+                semanticsLabel: 'Unit',
+                height: 3,
+                width: 3,
+                colorFilter: ColorFilter.mode(
+                  Pollutant.pm2_5.textColor(
+                    value: airQualityReading.pm2_5,
+                  ),
+                  BlendMode.srcIn,
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+        ),
+        const SizedBox(
+          width: 12,
+        ),
+        Expanded(
+          child: AutoSizeText(
+            "${airQualityReading.name} has been added to your favorites",
+            maxLines: 1,
+            minFontSize: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    ),
+    backgroundColor: CustomColors.appColorBlack,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
+class AuthFailureDialog extends StatelessWidget {
+  const AuthFailureDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: Text(
+        'Authentication is currently unavailable. You will be able to signup/sign in later.',
+        textAlign: TextAlign.center,
+        style: CustomTextStyle.headline8(context),
+      ),
+      actions: <Widget>[
+        CupertinoDialogAction(
+          onPressed: () async {
+            await _guestSignIn(context);
+          },
+          isDefaultAction: true,
+          isDestructiveAction: false,
+          child: Text(
+            'Proceed as Guest',
+            style: CustomTextStyle.button2(context)
+                ?.copyWith(color: CustomColors.appColorBlue),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _guestSignIn(BuildContext context) async {
+    await hasNetworkConnection().then((hasConnection) async {
+      if (!hasConnection) {
+        showSnackBar(context, "No internet connection");
+
+        return;
+      }
+      loadingScreen(context);
+      await CustomAuth.guestSignIn().then((success) async {
+        await AppService.postSignInActions(context).then((_) async {
+          Navigator.pop(context);
+          await Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) {
+              return const HomePage();
+            }),
+            (r) => true,
+          );
+        });
+      });
+    });
+  }
+}
+
 class SettingsDialog extends StatelessWidget {
   const SettingsDialog(this.message, {super.key});
   final String message;
@@ -375,37 +534,91 @@ class AuthMethodDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget title = Text(
+      authMethod == AuthMethod.email
+          ? 'Confirm Email Address'
+          : 'Confirm Phone Number',
+      textAlign: TextAlign.center,
+    );
+
+    Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(
+          height: 7,
+        ),
+        Text(
+          credentials,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            height: 18 / 16,
+          ),
+        ),
+        const SizedBox(
+          height: 7,
+        ),
+        Text(
+          authMethod == AuthMethod.email
+              ? 'Is the email address above correct?'
+              : 'Is the phone number above correct?',
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+
+    List<Widget> actions = [
+      CupertinoDialogAction(
+        onPressed: () {
+          Navigator.of(context).pop(ConfirmationAction.cancel);
+        },
+        isDefaultAction: true,
+        isDestructiveAction: true,
+        child: Text(
+          'Edit',
+          style: CustomTextStyle.caption4(context)
+              ?.copyWith(color: CustomColors.appColorBlue),
+        ),
+      ),
+      CupertinoDialogAction(
+        onPressed: () {
+          Navigator.of(context).pop(ConfirmationAction.ok);
+        },
+        isDefaultAction: true,
+        isDestructiveAction: false,
+        child: Text(
+          'Yes',
+          style: CustomTextStyle.caption4(context)
+              ?.copyWith(color: CustomColors.appColorBlue),
+        ),
+      ),
+    ];
+
     return CupertinoAlertDialog(
-      title: Text(
-        authMethod == AuthMethod.email
-            ? 'Confirm Email Address'
-            : 'Confirm Phone Number',
+      title: title,
+      content: content,
+      actions: actions,
+    );
+  }
+}
+
+class SignOutDeletionDialog extends StatelessWidget {
+  const SignOutDeletionDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: const Text(
+        "Re authentication is required",
         textAlign: TextAlign.center,
       ),
-      content: Column(
-        children: [
-          const SizedBox(
-            height: 7,
-          ),
-          Text(
-            credentials,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              height: 18 / 16,
-            ),
-          ),
-          const SizedBox(
-            height: 7,
-          ),
-          Text(
-            authMethod == AuthMethod.email
-                ? 'Is the email address above correct?'
-                : 'Is the phone number above correct?',
-            textAlign: TextAlign.center,
-          ),
-        ],
+      content: const Padding(
+        padding: EdgeInsets.all(10),
+        child: Text(
+          "You are required to sign in again inorder to delete your account. Do you want to proceed?",
+          textAlign: TextAlign.center,
+        ),
       ),
       actions: <Widget>[
         CupertinoDialogAction(
@@ -415,7 +628,7 @@ class AuthMethodDialog extends StatelessWidget {
           isDefaultAction: true,
           isDestructiveAction: true,
           child: Text(
-            'Edit',
+            "Cancel",
             style: CustomTextStyle.caption4(context)
                 ?.copyWith(color: CustomColors.appColorBlue),
           ),
@@ -427,7 +640,7 @@ class AuthMethodDialog extends StatelessWidget {
           isDefaultAction: true,
           isDestructiveAction: false,
           child: Text(
-            'Yes',
+            "Yes",
             style: CustomTextStyle.caption4(context)
                 ?.copyWith(color: CustomColors.appColorBlue),
           ),

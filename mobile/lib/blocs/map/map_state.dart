@@ -28,7 +28,7 @@ class MapState extends Equatable {
     this.featuredRegion = '',
     this.featuredCountry = '',
     this.searchResults = const [],
-    this.blocError = AuthenticationError.none,
+    this.blocError = FirebaseAuthError.authFailure, // TODO remove this
   });
 
   const MapState({
@@ -41,7 +41,7 @@ class MapState extends Equatable {
     this.featuredRegion = '',
     this.featuredCountry = '',
     this.searchResults = const [],
-    this.blocError = AuthenticationError.none,
+    this.blocError = FirebaseAuthError.authFailure, // TODO remove this
   });
 
   const MapState.initial() : this._();
@@ -55,8 +55,8 @@ class MapState extends Equatable {
     String? featuredRegion,
     String? featuredCountry,
     List<AirQualityReading>? airQualityReadings,
-    List<SearchResultItem>? searchResults,
-    AuthenticationError? blocError,
+    List<SearchResult>? searchResults,
+    FirebaseAuthError? blocError,
   }) {
     return MapState(
       featuredSiteReading: featuredSiteReading ?? this.featuredSiteReading,
@@ -81,8 +81,8 @@ class MapState extends Equatable {
   final String featuredRegion;
   final AirQualityReading? featuredSiteReading;
   final List<AirQualityReading> airQualityReadings;
-  final List<SearchResultItem> searchResults;
-  final AuthenticationError blocError;
+  final List<SearchResult> searchResults;
+  final FirebaseAuthError blocError;
 
   @override
   List<Object?> get props => [
@@ -117,7 +117,7 @@ class MapSearchState extends Equatable {
   MapSearchState copyWith({
     MapSearchStatus? mapStatus,
     List<AirQualityReading>? airQualityReadings,
-    List<SearchResultItem>? searchResults,
+    List<SearchResult>? searchResults,
     String? searchTerm,
   }) {
     return MapSearchState(
@@ -130,7 +130,7 @@ class MapSearchState extends Equatable {
 
   final MapSearchStatus mapStatus;
   final List<AirQualityReading> airQualityReadings;
-  final List<SearchResultItem> searchResults;
+  final List<SearchResult> searchResults;
   final String searchTerm;
 
   @override

@@ -4,15 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class Config {
   static String get airqoApiToken => dotenv.env['AIRQO_API_TOKEN'] ?? '';
+  static String get airqoApiV2Token => dotenv.env['AIRQO_API_V2_TOKEN'] ?? '';
   static String get searchApiKey => dotenv.env['SEARCH_API_KEY'] ?? '';
 
-  static String get airqoApiUrl =>
-      dotenv.env['AIRQO_API_URL'] ?? 'https://api.airqo.net/api/v1/';
+  static double get minimumTextScaleFactor => 1.0;
+  static double get maximumTextScaleFactor => 1.1;
 
-  static String get airqoApiUserExistsUrl =>
-      dotenv.env['AIRQO_API_USER_EXISTS_URL'] ?? '';
+  static String get airqoApi => 'https://api.airqo.net/api';
+
+  static String get automatedTestsEmail => "automated-tests@airqo.net";
+
+  static String get automatedTestsPhoneNumber => "+256757800000";
+
+  static String get guestLogInFailed =>
+      'Failed to login as guest. Try again later';
 
   static String get favPlacesCollection =>
       dotenv.env['FAV_PLACES_COLLECTION'] ?? '';
@@ -22,7 +31,7 @@ class Config {
   static String get usersNotificationCollection =>
       dotenv.env['USERS_NOTIFICATION_COLLECTION'] ?? '';
 
-  static String get usersAnalyticsCollection =>
+  static String get usersLocationHistoryCollection =>
       dotenv.env['USERS_ANALYTICS_COLLECTION'] ?? '';
 
   static String get usersCollection => dotenv.env['USERS_COLLECTION'] ?? '';
@@ -36,40 +45,51 @@ class Config {
   static String get prefOnBoardingPage =>
       dotenv.env['PREF_ON_BOARDING_PAGE'] ?? '';
 
-  static String get sentryDsn => dotenv.env['SENTRY_DSN'] ?? '';
+  static String get homePageShowcase => 'homePageShowcase';
+
+  static String get settingsPageShowcase => 'settingsPageShowcase';
+
+  static String get forYouPageShowcase => 'forYouPageShowcase';
+
+  static String get restartTourShowcase => 'restartTourShowcase';
+
+  static String get iosMinimumShareVersion =>
+      dotenv.env['IOS_MINIMUM_SHARE_VERSION'] ?? '2.0.17';
+
+  static int get androidMinimumShareVersion =>
+      int.parse(dotenv.env['ANDROID_MINIMUM_SHARE_VERSION'] ?? '20029');
+
+  static String get airqoSecondaryLogo =>
+      'https://storage.cloud.google.com/airqo-app/public-images/airqo_logo.png';
 
   static String get placesSearchUrl =>
       'https://maps.googleapis.com/maps/api/place/';
-
-  static String get appErrorMessage =>
-      'Failed to process your request. Try again later';
 
   static String get appStoreUrl =>
       'https://apps.apple.com/ug/app/airqo-monitoring-air-quality/id1337573091';
 
   static String get iosStoreId => '1337573091';
 
+  static String get iosBundleId => 'com.airqo.net';
+
+  static String get androidPackageName => 'com.airqo.app';
+
+  static String get signOutFailed => 'Failed to sign out. Try again later';
+
   static String get connectionErrorMessage => 'No internet connection';
 
   static String get environmentFile => kReleaseMode ? '.env.prod' : '.env.dev';
 
-  static String get allowLocationMessage =>
-      'Turn on and allow location permissions';
-
-  static String get feedbackSuccessMessage => 'Thanks for the feedback';
-
-  static String get shareFailedMessage => 'Couldn\'t share image.';
-
-  static String get feedbackFailureMessage =>
-      'Could not capture your feedback. Try again later';
-
-  static String get locationErrorMessage =>
-      'Cannot get your location at the moment';
+  static int get locationChangeRadiusInMetres => 100;
 
   static String get playStoreUrl =>
       'https://play.google.com/store/apps/details?id=com.airqo.app';
 
   static int get searchRadius => 4;
+
+  static int get surroundingsSitesMaxRadiusInKilometres => 20;
+
+  static int get shareLinkMaxLength => 56;
 
   static String get termsUrl =>
       'https://docs.airqo.net/#/mobile_app/privacy_policy';
@@ -97,7 +117,7 @@ class Config {
       locationSettings = AppleSettings(
         accuracy: LocationAccuracy.high,
         activityType: ActivityType.fitness,
-        distanceFilter: 100,
+        distanceFilter: Config.locationChangeRadiusInMetres,
         showBackgroundLocationIndicator: false,
       );
     } else {

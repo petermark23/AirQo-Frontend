@@ -1,14 +1,12 @@
 import 'dart:async';
 
 import 'package:app/blocs/blocs.dart';
-import 'package:app/constants/constants.dart';
 import 'package:app/models/models.dart';
 import 'package:app/screens/analytics/analytics_widgets.dart';
 import 'package:app/services/services.dart';
 import 'package:app/themes/theme.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/widgets/widgets.dart';
-import 'package:app_repository/app_repository.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,9 +43,10 @@ class RegionAvatar extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: Center(
-        child: SvgPicture.asset(
-          'assets/icon/location.svg',
+        child: Icon(
+          Icons.location_on_rounded,
           color: CustomColors.appColorBlue,
+          size: 27,
         ),
       ),
     );
@@ -106,11 +105,11 @@ class SiteTile extends StatelessWidget {
           color: CustomColors.appColorBlack.withOpacity(0.4),
         ),
       ),
-      trailing: SvgPicture.asset(
-        'assets/icon/more_arrow.svg',
-        semanticsLabel: 'more',
-        height: 6.99,
-        width: 4,
+      trailing: const Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 10,
+        semanticLabel: 'more',
+        weight: 1000,
       ),
       leading: MiniAnalyticsAvatar(airQualityReading: airQualityReading),
     );
@@ -118,21 +117,19 @@ class SiteTile extends StatelessWidget {
 }
 
 class SearchTile extends StatelessWidget {
-  SearchTile({
+  const SearchTile({
     super.key,
     required this.searchResult,
   });
-  final SearchResultItem searchResult;
-  final SearchRepository _searchRepository =
-      SearchRepository(searchApiKey: Config.searchApiKey);
+  final SearchResult searchResult;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 0.0),
       leading: const RegionAvatar(),
-      onTap: () {
-        _showPlaceDetails(context);
+      onTap: () async {
+        await _showPlaceDetails(context);
       },
       title: AutoSizeText(
         searchResult.name,
@@ -150,149 +147,55 @@ class SearchTile extends StatelessWidget {
           color: CustomColors.appColorBlack.withOpacity(0.3),
         ),
       ),
-      trailing: SvgPicture.asset(
-        'assets/icon/more_arrow.svg',
-        semanticsLabel: 'more',
-        height: 6.99,
-        width: 4,
+      trailing: const Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 10,
+        semanticLabel: 'more',
+        weight: 1000,
       ),
     );
   }
 
   Future<void> _showPlaceDetails(BuildContext context) async {
     loadingScreen(context);
-
-    final place = await _searchRepository.placeDetails(searchResult.id);
-
-    if (place != null) {
-      final nearestSite = await LocationService.getNearestSite(
-        place.geometry.location.lat,
-        place.geometry.location.lng,
-      );
-
-      Navigator.pop(context);
-
-      // TODO: Substitute with widget
-      if (nearestSite == null) {
-        showSnackBar(
-          context,
-          'Oops!!.. We don’t have air quality readings for'
-          ' ${searchResult.name}',
-          durationInSeconds: 3,
-        );
-
-        return;
-      }
-
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return InsightsPage(
+    await SearchApiClient()
+        .getPlaceDetails(
+      searchResult,
+    )
+        .then((place) async {
+      if (place != null) {
+        await LocationService.getNearestSite(
+          place.latitude,
+          place.longitude,
+        ).then((nearestSite) async {
+          Navigator.pop(context);
+          if (nearestSite == null) {
+            showSnackBar(
+              context,
+              'Oops!!.. We don’t have air quality readings for'
+              ' ${searchResult.name}',
+              durationInSeconds: 3,
+            );
+          } else {
+            await navigateToInsights(
+              context,
               nearestSite.copyWith(
                 name: searchResult.name,
                 location: searchResult.location,
                 placeId: searchResult.id,
-                latitude: place.geometry.location.lat,
-                longitude: place.geometry.location.lng,
+                latitude: place.latitude,
+                longitude: place.longitude,
               ),
             );
-          },
-        ),
-      );
-    } else {
-      showSnackBar(
-        context,
-        'Try again later',
-      );
-    }
-  }
-}
-
-class EmptyView extends StatelessWidget {
-  const EmptyView({
-    super.key,
-    required this.title,
-    required this.bodyInnerText,
-    required this.topBars,
-    required this.showRegions,
-  });
-  final String title;
-  final String bodyInnerText;
-  final bool topBars;
-  final VoidCallback showRegions;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Visibility(
-          visible: topBars,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                height: 32,
-                width: 32,
-                decoration: BoxDecoration(
-                  color: CustomColors.appBodyColor,
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(8.0),
-                  ),
-                ),
-                child: Center(
-                  child: IconButton(
-                    iconSize: 10,
-                    icon: Icon(
-                      Icons.clear,
-                      color: CustomColors.appColorBlack,
-                    ),
-                    onPressed: showRegions,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(
-          height: 80,
-        ),
-        Image.asset(
-          'assets/icon/coming_soon.png',
-          height: 80,
-          width: 80,
-        ),
-        const SizedBox(
-          height: 16,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 30, right: 30),
-          child: Text(
-            '$title\nComing soon on the network'.trim(),
-            textAlign: TextAlign.center,
-            style: CustomTextStyle.headline7(context)
-                ?.copyWith(letterSpacing: 16 * -0.01),
-          ),
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20),
-          child: Text(
-            'We currently do not support air quality '
-            'monitoring in this $bodyInnerText, but we’re working on it.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                  color: CustomColors.appColorBlack.withOpacity(0.4),
-                ),
-          ),
-        ),
-        const SizedBox(
-          height: 158,
-        ),
-      ],
-    );
+          }
+        });
+      } else {
+        showSnackBar(
+          context,
+          'Try again later',
+        );
+      }
+    });
   }
 }
 
@@ -314,11 +217,11 @@ class CountryTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: CustomTextStyle.headline8(context),
       ),
-      trailing: SvgPicture.asset(
-        'assets/icon/more_arrow.svg',
-        semanticsLabel: 'more',
-        height: 6.99,
-        width: 4,
+      trailing: const Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 10,
+        semanticLabel: 'more',
+        weight: 1000,
       ),
     );
   }
@@ -430,17 +333,7 @@ class RegionSites extends StatelessWidget {
                     ),
                   ),
                 ),
-                Visibility(
-                  visible: state.featuredAirQualityReadings.isEmpty,
-                  child: EmptyView(
-                    title: state.featuredRegion.toTitleCase(),
-                    topBars: false,
-                    bodyInnerText: 'region',
-                    showRegions: () {
-                      context.read<MapBloc>().add(const InitializeMapState());
-                    },
-                  ),
-                ),
+                // TODO added empty widget
               ],
             ),
           );
@@ -479,11 +372,11 @@ class RegionTile extends StatelessWidget {
           color: CustomColors.appColorBlack.withOpacity(0.3),
         ),
       ),
-      trailing: SvgPicture.asset(
-        'assets/icon/more_arrow.svg',
-        semanticsLabel: 'more',
-        height: 6.99,
-        width: 4,
+      trailing: const Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 10,
+        semanticLabel: 'more',
+        weight: 1000,
       ),
     );
   }
@@ -514,35 +407,33 @@ class FeaturedSiteReading extends StatelessWidget {
 }
 
 class MapAnalyticsCard extends StatelessWidget {
-  MapAnalyticsCard(this.airQualityReading, {super.key});
+  const MapAnalyticsCard(this.airQualityReading, {super.key});
   final AirQualityReading airQualityReading;
-  final GlobalKey _shareWidgetKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     final appColors = Theme.of(context).extension<AppColors>()!;
 
-    return Container(
-      constraints: const BoxConstraints(
-        maxHeight: 251,
-        minHeight: 251,
-      ),
-      color: Colors.white,
-      child: Stack(
+    return SizedBox(
+      height: 257,
+      width: double.infinity,
+      child: Column(
         children: [
-          RepaintBoundary(
-            key: _shareWidgetKey,
-            child: AnalyticsShareCard(airQualityReading: airQualityReading),
-          ),
-          InkWell(
-            onTap: () async => _goToInsights(context),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(16.0),
+          Expanded(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: CustomColors.appColorBlue,
+                elevation: 0,
+                side: const BorderSide(
+                  color: Colors.transparent,
+                  width: 0,
                 ),
+                backgroundColor: Colors.white,
+                padding: EdgeInsets.zero,
               ),
+              onPressed: () async {
+                await navigateToInsights(context, airQualityReading);
+              },
               child: Column(
                 children: [
                   Padding(
@@ -595,7 +486,6 @@ class MapAnalyticsCard extends StatelessWidget {
                               const SizedBox(
                                 width: 16.0,
                               ),
-                              // TODO : investigate ellipsis
                               Flexible(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -637,9 +527,8 @@ class MapAnalyticsCard extends StatelessWidget {
                                                 3.2,
                                           ),
                                           child: Text(
-                                            dateToString(
-                                              airQualityReading.dateTime,
-                                            ),
+                                            airQualityReading.dateTime
+                                                .analyticsCardString(),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
@@ -665,35 +554,24 @@ class MapAnalyticsCard extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 32),
                         child: AnalyticsMoreInsights(),
                       ),
-                      const SizedBox(height: 12),
-                      const Divider(
-                        color: Color(0xffC4C4C4),
-                        height: 1.0,
-                      ),
                     ],
-                  ),
-                  Expanded(
-                    child: AnalyticsCardFooter(
-                      shareKey: _shareWidgetKey,
-                      airQualityReading: airQualityReading,
-                    ),
                   ),
                 ],
               ),
             ),
           ),
+          const Divider(
+            color: Color(0xffC4C4C4),
+            height: 1.0,
+          ),
+          SizedBox(
+            height: 58,
+            child: AirQualityActions(
+              airQualityReading,
+              radius: 0,
+            ),
+          ),
         ],
-      ),
-    );
-  }
-
-  Future<void> _goToInsights(BuildContext context) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return InsightsPage(airQualityReading);
-        },
       ),
     );
   }
@@ -784,20 +662,6 @@ class SearchResults extends StatelessWidget {
   }
 }
 
-class SearchLoadingWidget extends StatelessWidget {
-  const SearchLoadingWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 20),
-      child: Center(
-        child: LoadingWidget(backgroundColor: Colors.transparent),
-      ),
-    );
-  }
-}
-
 class SearchWidget extends StatelessWidget {
   SearchWidget({super.key});
   final TextEditingController _searchController = TextEditingController();
@@ -849,7 +713,7 @@ class SearchWidget extends StatelessWidget {
                     context.read<MapBloc>().add(const InitializeSearch());
                     context.read<MapSearchBloc>().add(const InitializeSearch());
                   },
-                  style: Theme.of(context).textTheme.caption?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontSize: 16,
                       ),
                   enableSuggestions: true,
@@ -858,21 +722,21 @@ class SearchWidget extends StatelessWidget {
                   cursorColor: CustomColors.appColorBlack,
                   decoration: InputDecoration(
                     fillColor: Colors.white,
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.symmetric(
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 0,
                         vertical: 7,
                       ),
-                      child: SvgPicture.asset(
-                        'assets/icon/search.svg',
-                        semanticsLabel: 'Search',
+                      child: Icon(
+                        Icons.search_rounded,
+                        semanticLabel: 'Search',
                       ),
                     ),
                     contentPadding: EdgeInsets.zero,
                     focusedBorder: outlineInputBorder,
                     enabledBorder: outlineInputBorder,
                     border: outlineInputBorder,
-                    hintStyle: Theme.of(context).textTheme.caption?.copyWith(
+                    hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: CustomColors.appColorBlack.withOpacity(0.32),
                           fontSize: 14,
                           fontWeight: FontWeight.w400,

@@ -5,55 +5,22 @@ abstract class PhoneAuthEvent extends Equatable {
 }
 
 class InitializePhoneAuth extends PhoneAuthEvent {
-  const InitializePhoneAuth({
-    required this.phoneNumber,
-    required this.authProcedure,
-  });
-  final String phoneNumber;
+  const InitializePhoneAuth(this.authProcedure);
+
   final AuthProcedure authProcedure;
   @override
-  List<Object?> get props => [];
+  List<Object> get props => [authProcedure];
 }
 
-class ClearPhoneNumberEvent extends PhoneAuthEvent {
-  const ClearPhoneNumberEvent();
-  @override
-  List<Object?> get props => [];
-}
+class SetPhoneAuthStatus extends PhoneAuthEvent {
+  const SetPhoneAuthStatus(this.status, {this.errorMessage});
 
-class InitiatePhoneNumberVerification extends PhoneAuthEvent {
-  const InitiatePhoneNumberVerification({
-    required this.context,
-  });
-  final BuildContext context;
-  @override
-  List<Object?> get props => [];
-}
+  final AuthenticationStatus status;
+  final String? errorMessage;
 
-class UpdateStatus extends PhoneAuthEvent {
-  const UpdateStatus(this.authStatus, {this.error});
-  final BlocStatus authStatus;
-  final AuthenticationError? error;
   @override
-  List<Object?> get props => [authStatus, error];
-}
-
-class UpdateCountryCode extends PhoneAuthEvent {
-  const UpdateCountryCode(this.code);
-  final String code;
-  @override
-  List<Object?> get props => [code];
-}
-
-class UpdatePhoneNumber extends PhoneAuthEvent {
-  const UpdatePhoneNumber(this.phoneNumber);
-  final String phoneNumber;
-  @override
-  List<Object?> get props => [phoneNumber];
-}
-
-class InvalidPhoneNumber extends PhoneAuthEvent {
-  const InvalidPhoneNumber();
-  @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        status,
+        errorMessage,
+      ];
 }

@@ -26,17 +26,20 @@ class AirQualityReadingAdapter extends TypeAdapter<AirQualityReading> {
       location: fields[6] == null ? '' : fields[6] as String,
       region: fields[13] == null ? '' : fields[13] as String,
       dateTime: fields[8] as DateTime,
-      pm2_5: fields[9] == null ? 0.0 : fields[9] as double,
-      pm10: fields[10] == null ? 0.0 : fields[10] as double,
+      pm2_5: fields[9] as double,
+      pm10: fields[10] as double?,
       distanceToReferenceSite: fields[11] == null ? 0.0 : fields[11] as double,
       placeId: fields[12] == null ? '' : fields[12] as String,
+      shareLink: fields[14] == null ? '' : fields[14] as String,
+      healthTips:
+          fields[15] == null ? [] : (fields[15] as List).cast<HealthTip>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, AirQualityReading obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.referenceSite)
       ..writeByte(1)
@@ -62,7 +65,11 @@ class AirQualityReadingAdapter extends TypeAdapter<AirQualityReading> {
       ..writeByte(12)
       ..write(obj.placeId)
       ..writeByte(13)
-      ..write(obj.region);
+      ..write(obj.region)
+      ..writeByte(14)
+      ..write(obj.shareLink)
+      ..writeByte(15)
+      ..write(obj.healthTips);
   }
 
   @override
@@ -80,37 +87,34 @@ class AirQualityReadingAdapter extends TypeAdapter<AirQualityReading> {
 // JsonSerializableGenerator
 // **************************************************************************
 
-AirQualityReading _$AirQualityReadingFromJson(Map<String, dynamic> json) =>
-    AirQualityReading(
-      referenceSite: json['referenceSite'] as String? ?? '',
-      source: json['source'] as String? ?? '',
-      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
-      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
-      country: json['country'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      location: json['location'] as String? ?? '',
-      region: json['region'] as String? ?? '',
-      dateTime: DateTime.parse(json['dateTime'] as String),
-      pm2_5: (json['pm2_5'] as num?)?.toDouble() ?? 0.0,
-      pm10: (json['pm10'] as num?)?.toDouble() ?? 0.0,
-      distanceToReferenceSite:
-          (json['distanceToReferenceSite'] as num?)?.toDouble() ?? 0.0,
-      placeId: json['placeId'] as String? ?? '',
+PollutantValue _$PollutantValueFromJson(Map<String, dynamic> json) =>
+    PollutantValue(
+      value: PollutantValue._valueFromJson(json['value']),
+      calibratedValue: PollutantValue._valueFromJson(json['calibratedValue']),
     );
 
-Map<String, dynamic> _$AirQualityReadingToJson(AirQualityReading instance) =>
-    <String, dynamic>{
-      'referenceSite': instance.referenceSite,
-      'latitude': instance.latitude,
-      'longitude': instance.longitude,
-      'country': instance.country,
-      'name': instance.name,
-      'source': instance.source,
-      'location': instance.location,
-      'dateTime': instance.dateTime.toIso8601String(),
-      'pm2_5': instance.pm2_5,
-      'pm10': instance.pm10,
-      'distanceToReferenceSite': instance.distanceToReferenceSite,
-      'placeId': instance.placeId,
-      'region': instance.region,
-    };
+Site _$SiteFromJson(Map<String, dynamic> json) {
+  $checkKeys(
+    json,
+    requiredKeys: const [
+      '_id',
+      'approximate_latitude',
+      'approximate_longitude',
+      'name',
+      'description'
+    ],
+  );
+  return Site(
+    id: json['_id'] as String,
+    latitude: (json['approximate_latitude'] as num).toDouble(),
+    longitude: (json['approximate_longitude'] as num).toDouble(),
+    name: json['name'] as String,
+    description: json['description'] as String,
+    searchName: json['search_name'] as String? ?? '',
+    searchLocation: json['location_name'] as String? ?? '',
+    country: json['country'] as String? ?? '',
+    region: json['region'] as String? ?? '',
+    source: json['network'] as String? ?? '',
+    shareLinks: json['share_links'] as Map<String, dynamic>? ?? {},
+  );
+}

@@ -1,4 +1,13 @@
+
 # AirQo mobile app
+
+<a href="https://github.com/airqo-platform/AirQo-frontend/actions">
+<img src="https://github.com/airqo-platform/AirQo-frontend/workflows/mobile-app-code-tests/badge.svg" alt="Build Status">
+</a>
+
+<a href="https://github.com/airqo-platform/AirQo-frontend/actions">
+<img src="https://github.com/airqo-platform/AirQo-frontend/workflows/mobile-app-code-analysis/badge.svg" alt="Build Status">
+</a>
 
 ## **Prerequisites**
 
@@ -37,7 +46,7 @@
 For example if `airqo-dev-keystore.jks` is located under `/Users/example/` then `storeFile=/Users/example/airqo-dev-keystore.jks`
 
 ### **For Contributors:**
-  - It's important to first read our guidelines [here](/../CONTRIBUTING.md).
+  - It's important to first read our guidelines [here](/CONTRIBUTING.md).
   - Thereafter, proceed to create your own necessary configuration files. These include;
     - Add an `.env file`, which contain credentials in key-value format for services used by the app. For development, save the file as `.env.dev` while for production, save it as `.env.prod`. 
       - Here's what your .env file would look like;
@@ -112,6 +121,7 @@ flutter run --flavor airqo -t lib/main.dart
 ```bash
 flutter run --flavor airqo -t lib/main.dart --release
 ```
+
 ### **Running the application in Github Actions - Firebase App Distribution(CI/CD)**
 * Fastlane is triggered to update FirebaseApp app distribution every time a PR is merged
 * To modify the workflow, open the .github/workflows folder, and navigate to deploy-mobile-android-to-firebase-app-distribuion.yml
@@ -119,17 +129,16 @@ flutter run --flavor airqo -t lib/main.dart --release
 * After making changes locally, specify what feature you wish to be tested in mobile/android/release-notes.txt and open a pull request
 * To create a final build that can be used for production, increment the version number in pubspec.yaml file
 
-
-
 ## **Useful commands**
 
 ### **Code formatting and analysis**
 
 ```bash
+bash upgrade-dependencies.sh
 flutter packages pub run build_runner build --delete-conflicting-outputs
 dart fix --dry-run
 dart fix --apply
-flutter format lib/
+dart format lib/
 flutter pub run dart_code_metrics:metrics analyze lib --reporter=html
 flutter pub run dart_code_metrics:metrics check-unused-files lib
 flutter pub run dart_code_metrics:metrics check-unused-code lib
@@ -138,6 +147,8 @@ flutter pub run dart_code_metrics:metrics check-unused-code lib
 ### **Building for release**
 
 ```bash
+flutter build appbundle --build-name 1.0.0 --build-number 20025 --flavor airqo
+flutter build ipa --build-name 1.0.0 --build-number 1 --flavor airqo
 flutter build appbundle --obfuscate --split-debug-info=${PWD}/obfuscate
 flutter build ipa --obfuscate --split-debug-info=${PWD}/obfuscate
 flutter build appbundle [--analyze-size]

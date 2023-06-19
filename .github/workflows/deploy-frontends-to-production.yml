@@ -25,8 +25,9 @@ on:
         type: boolean
 
 env:
-  REGISTRY_URL: gcr.io
+  REGISTRY_URL: eu.gcr.io
   PROJECT_ID: airqo-250220
+  DEPLOY_BRANCH: staging
 
 jobs:
   image-tag:
@@ -58,18 +59,18 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Google login
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_CREDENTIALS }}
 
       - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
 
       - name: Create .env file
         run: gcloud secrets versions access latest --secret="prod-env-netmanager" > netmanager/.env
 
       - name: NPM Setup and Build
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "12"
       - run: |
@@ -78,9 +79,9 @@ jobs:
           CI=false npm run build
 
       - name: Login to GCR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
-          registry: ${{ secrets.REGISTRY_URL }}
+          registry: ${{ env.REGISTRY_URL }}
           username: _json_key
           password: ${{ secrets.GCR_CONFIG }}
 
@@ -93,19 +94,20 @@ jobs:
           docker push ${{ env.REGISTRY_URL }}/${{ env.PROJECT_ID }}/airqo-platform-frontend:latest
 
       - name: Update corresponding helm values file(with retry)
-        uses: Wandalen/wretry.action@master # Retries action on fail
+        uses: Wandalen/wretry.action@v1.0.36 # Retries action on fail
         with:
           action: fjogeleit/yaml-update-action@main # Action to retry
           with: |
             valueFile: "k8s/netmanager/values-prod.yaml"
             propertyPath: "image.tag"
             value: ${{ needs.image-tag.outputs.build_id }}
-            branch: deployment/argocd
+            branch: ${{ env.DEPLOY_BRANCH }}
+            token: ${{ secrets.YAML_UPDATER_TOKEN }}
             message: "Update netmanger production image tag to ${{ needs.image-tag.outputs.build_id }}"
             createPR: false
 
       - name: Login to K8S
-        uses: azure/k8s-set-context@v1
+        uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.K8S_CONFIG_PROD }}
@@ -126,9 +128,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Login to GCR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
-          registry: ${{ secrets.REGISTRY_URL }}
+          registry: ${{ env.REGISTRY_URL }}
           username: _json_key
           password: ${{ secrets.GCP_FRONTEND_PROJECT_SA_CREDENTIALS }}
 
@@ -136,12 +138,12 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Google login
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: "${{ secrets.GCP_FRONTEND_PROJECT_SA_CREDENTIALS }}"
 
       - name: Setup Cloud SDK
-        uses: "google-github-actions/setup-gcloud@v0"
+        uses: "google-github-actions/setup-gcloud@v1"
 
       - name: Create google_application_credentials.json file
         id: create-google-application-credentials-file
@@ -208,18 +210,18 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Google login
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_CREDENTIALS }}
 
       - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
 
       - name: Create .env file
         run: gcloud secrets versions access latest --secret="prod-env-calibrate-app" > calibrate/.env
 
       - name: NPM Setup and Build
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "12"
       - run: |
@@ -228,9 +230,9 @@ jobs:
           CI=false npm run build
 
       - name: Login to GCR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
-          registry: ${{ secrets.REGISTRY_URL }}
+          registry: ${{ env.REGISTRY_URL }}
           username: _json_key
           password: ${{ secrets.GCR_CONFIG }}
 
@@ -243,18 +245,19 @@ jobs:
           docker push ${{ env.REGISTRY_URL }}/${{ env.PROJECT_ID }}/airqo-calibrate-app:latest
 
       - name: Update corresponding helm values file(with retry)
-        uses: Wandalen/wretry.action@master # Retries action on fail
+        uses: Wandalen/wretry.action@v1.0.36 # Retries action on fail
         with:
           action: fjogeleit/yaml-update-action@main # Action to retry
           with: |
             valueFile: "k8s/calibrate/values-prod.yaml"
             propertyPath: "image.tag"
             value: ${{ needs.image-tag.outputs.build_id }}
-            branch: deployment/argocd
+            branch: ${{ env.DEPLOY_BRANCH }}
+            token: ${{ secrets.YAML_UPDATER_TOKEN }}
             message: "Update calibrate app production image tag to ${{ needs.image-tag.outputs.build_id }}"
 
       - name: Login to K8S
-        uses: azure/k8s-set-context@v1
+        uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.K8S_CONFIG_PROD }}
@@ -275,20 +278,20 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Google login
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_CREDENTIALS }}
 
       - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
 
       - name: Create .env file
         run: gcloud secrets versions access latest --secret="prod-env-next-platform" > platform/.env
 
       - name: Login to GCR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
-          registry: ${{ secrets.REGISTRY_URL }}
+          registry: ${{ env.REGISTRY_URL }}
           username: _json_key
           password: ${{ secrets.GCR_CONFIG }}
 
@@ -301,18 +304,19 @@ jobs:
           docker push ${{ env.REGISTRY_URL }}/${{ env.PROJECT_ID }}/airqo-next-platform:latest
 
       - name: Update corresponding helm values file(with retry)
-        uses: Wandalen/wretry.action@master # Retries action on fail
+        uses: Wandalen/wretry.action@v1.0.36 # Retries action on fail
         with:
           action: fjogeleit/yaml-update-action@main # Action to retry
           with: |
             valueFile: "k8s/platform/values-prod.yaml"
             propertyPath: "image.tag"
             value: ${{ needs.image-tag.outputs.build_id }}
-            branch: deployment/argocd
+            branch: ${{ env.DEPLOY_BRANCH }}
+            token: ${{ secrets.YAML_UPDATER_TOKEN }}
             message: "Update analytics platform production image tag to ${{ needs.image-tag.outputs.build_id }}"
 
       - name: Login to K8S
-        uses: azure/k8s-set-context@v1
+        uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.K8S_CONFIG_PROD }}
@@ -333,9 +337,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Login to GCR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
-          registry: ${{ secrets.REGISTRY_URL }}
+          registry: ${{ env.REGISTRY_URL }}
           username: _json_key
           password: ${{ secrets.GCR_CONFIG }}
 
@@ -348,12 +352,13 @@ jobs:
           docker push ${{ env.REGISTRY_URL }}/${{ env.PROJECT_ID }}/airqo-prod-docs:latest
 
       - name: Update corresponding helm values file(with retry)
-        uses: Wandalen/wretry.action@master # Retries action on fail
+        uses: Wandalen/wretry.action@v1.0.36 # Retries action on fail
         with:
           action: fjogeleit/yaml-update-action@main # Action to retry
           with: |
             valueFile: "k8s/docs/values-prod.yaml"
             propertyPath: "image.tag"
             value: ${{ needs.image-tag.outputs.build_id }}
-            branch: deployment/argocd
+            branch: ${{ env.DEPLOY_BRANCH }}
+            token: ${{ secrets.YAML_UPDATER_TOKEN }}
             message: "Update docs production image tag to ${{ needs.image-tag.outputs.build_id }}"
