@@ -16,7 +16,7 @@ const DeviceOverviewCharts = ({ deviceName }) => {
   const deviceUptimeData = useDeviceUptimeData(deviceName);
 
   useEffect(() => {
-    if (isEmpty(deviceUptimeData) && deviceName) {
+    if (isEmpty(deviceUptimeData) && deviceName){
       dispatch(
         loadSingleDeviceUptime({
           device_name: deviceName,

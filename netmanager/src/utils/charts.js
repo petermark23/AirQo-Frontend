@@ -1,10 +1,14 @@
 import palette from "assets/theme/palette";
 
+
+//Coverts date-time string into a timestamp
 export const dateToTimestamp = (datetimeStr) => {
   let datum = new Date(datetimeStr);
   return datum.getTime() / 1000;
 };
 
+
+//Maps each date in the dates array to its corresponding data 
 export const ApexTimeSeriesData = (dates, data) => {
   let result = [];
   // dates.map((date, index) => {
@@ -160,16 +164,28 @@ export const createChartJsData = (data, key) => {
   ];
 
   data.map((datum) => {
+    //check for site property and retrieve the first site
     const site = (datum.sites && datum.sites[0]) || {};
+
+    //create site name
     const siteName = `${
       site.name || site.description || site.generated_name
     } (${site.generated_name})`;
+
+    //get unique time label fro each site object
     labels.add(datum._id.time);
+
+    //if siteName key doesn't exist with sites array, assign to empty array for that site
     if (!sites[siteName]) sites[siteName] = [];
     sites[siteName].push(datum[key]);
   });
+
+  //Iterate over each site key
   Object.keys(sites).map((site_key) => {
+
+    //Retrieve last color 
     const color = colors.pop();
+
     formatted_data.push({
       data: sites[site_key],
       label: site_key,
@@ -180,7 +196,10 @@ export const createChartJsData = (data, key) => {
   });
 
   return {
+    //convert labels set into array
     labels: Array.from(labels),
+
+    //assign datasets key with site data array
     datasets: formatted_data,
   };
 };

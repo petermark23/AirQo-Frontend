@@ -10,6 +10,7 @@ import ApexCharts from 'apexcharts';
 class ApexChart extends Component {
   constructor(props) {
     super(props);
+    //bind charttypechange to current component instance
     this.onChartTypeChange = this.onChartTypeChange.bind(this);
     this.state = {
       chartType: this.props.type,
@@ -19,6 +20,7 @@ class ApexChart extends Component {
     };
   }
 
+  //Update component state if props change
   componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
       this.setState(this.props);
@@ -28,6 +30,7 @@ class ApexChart extends Component {
   componentDidMount() {
     this.updateChartData(); // Initialize chart data
 
+    //update chart data every 30
     this.interval = window.setInterval(() => {
       this.updateChartData();
       ApexCharts.exec('realtime', 'updateSeries', [
@@ -51,20 +54,22 @@ class ApexChart extends Component {
     const newData = Math.random() * 100;
     const series = this.state.series.slice();
     const lastDataPoint =
-      series[0].data.length > 0 ? series[0].data[series[0].data.length - 1] : null;
+      this.state.series[0].data.length > 0 ? this.state.series[0].data[this.state.series[0].data.length - 1] : null;
     // Fill in missing data with 0 values
     if (lastDataPoint) {
       console.log('filling in');
       const timeSinceLastData = new Date().getTime() - lastDataPoint.x;
+
+      //calculate the number of intervals of 30 minutes since the last data point.
       const missingDataPoints = Math.floor(timeSinceLastData / (30 * 60 * 1000));
       for (let i = 1; i <= missingDataPoints; i++) {
-        series[0].data.push({
+        this.state.series[0].data.push({
           x: lastDataPoint.x + i * 30 * 60 * 1000,
           y: 0
         });
       }
     }
-    series[0].data.push({
+    this.state.series[0].data.push({
       x: new Date().getTime(),
       y: newData
     });

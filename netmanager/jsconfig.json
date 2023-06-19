@@ -7,7 +7,7 @@
             "redux/*": ["redux/*"],
             "theme/*": ["theme/*"],
             "utils/*": ["utils/*"],
-            "themes/*": ["themes*"]
+            "views/*": ["views/*"]
         }
     },
     "include": ["src"]
