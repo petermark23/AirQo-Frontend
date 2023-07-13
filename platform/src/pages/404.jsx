@@ -10,7 +10,7 @@ const error404 = () => {
       </div>
       <div className='flex flex-col justify-center items-center mt-14 w-full md:px-48 px-6'>
         <OopsIcon />
-        <div className='flex flex-col justify-center items-center w-full mt-6'>
+        <div className='flex flex-col justify-center items-center w-full mt-5'>
           <h1 className='text-4xl md:text-[40px] font-normal w-full max-w-xl text-center text-black-900 md:leading-[56px]'>
             <span className='text-blue-900 font-bold'>Oops!</span> We can't seem to find the page
             you're looking for
